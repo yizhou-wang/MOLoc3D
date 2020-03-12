@@ -20,6 +20,7 @@ class KITTI_raw:
 
 class KITTI_tracking:
     def __init__(self, basedir, drive):
+        # TODO: finish configurations for kitti tracking dataset
         self.data = pykitti.tracking(basedir, drive)
         self.original_shape = (1242, 375)
         self.operate_folder_name = 'image_02'
