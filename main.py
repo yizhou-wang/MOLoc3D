@@ -21,9 +21,9 @@ from dataloaders.write_dets_3d import save_dets_3d
 from utils.visualization import visualize_dets_3d, visualize_dets_3d_eval, visualize_dets_3d_eval_demo
 
 from dataloaders.read_gt_dets import read_gt_dets_from_xml
-from evaluation import match_dets_with_det_gt
-from evaluation import evaluate_3d_loc, evaluate_3d_loc_demo
-from evaluation import print_eval_results
+from utils.evaluation import match_dets_with_det_gt
+from utils.evaluation import evaluate_3d_loc, evaluate_3d_loc_demo
+from utils.evaluation import print_eval_results
 
 
 def parse_args():

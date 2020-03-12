@@ -6,9 +6,7 @@ import utils.parseTrackletXML as xmlParser
 from utils.utils import calculate_iou_btw_obj
 from utils.utils import dist_btw_two_points
 from utils.utils import random_colors
-# from utils.visualization import visualize_3d_loc_in_frame_demo
-# from utils.visualization import visualize_gt_dets
-
+from utils.visualization import visualize_dets_3d_eval_in_frame, visualize_dets_3d_eval_in_frame_demo
 from dataloaders.read_gt_dets import read_gt_dets_from_xml
 
 
@@ -22,8 +20,6 @@ def evaluate(data_root, class_name_list):
 
     # match detections with ground truth detections
     # match_dets_with_det_gt(dets, dets_gt)
-
-
 
 
 def match_dets_with_det_gt(dets, dets_gt):
@@ -134,7 +130,6 @@ def calculate_eval_metrics_in_frame(dets, dets_gt, metrics):
             else:
                 dist_ae_far_list.append(dist_ae)
 
-
             # set metrics for obj
             obj.set_eval_metrics('flag', True)
             obj.set_eval_metrics('depth_e', depth_e)
@@ -188,7 +183,6 @@ def calculate_eval_metrics_in_frame(dets, dets_gt, metrics):
 
 
 def evaluate_3d_loc(data_root, dataset, dets, dets_gt, metrics=None, viz=False, log=True):
-
     operate_folder = dataset.operate_folder_name
     image_folder = dataset.image_folder_name
 
@@ -218,16 +212,14 @@ def evaluate_3d_loc(data_root, dataset, dets, dets_gt, metrics=None, viz=False, 
                     obj_gt_match_in_frame.append(None)
             eval_metrics = calculate_eval_metrics_in_frame(dets_in_frame, obj_gt_match_in_frame, metrics=metrics)
         if viz:
-            # visualize_3d_loc_in_frame(im_name, dets_in_frame, obj_gt_match_in_frame, eval_metrics)
-            visualize_3d_loc_in_frame_demo(im_name, dets_in_frame, eval_metrics, colors)
-            # visualize_gt_dets(im_name, dets_gt_in_frame)
+            # visualize_dets_3d_eval_in_frame(im_name, dets_in_frame, obj_gt_match_in_frame, eval_metrics)
+            visualize_dets_3d_eval_in_frame_demo(im_name, dets_in_frame, eval_metrics, colors)
         eval_metrics_all_frames.append(eval_metrics)
 
     return eval_metrics_all_frames
 
 
 def evaluate_3d_loc_demo(frame_names, dets, dets_gt, gnd_masks, metrics=None, viz=False, log=True):
-
     # detections and gt detections must have the same length of frame number
     assert len(dets) == len(dets_gt)
 
@@ -251,57 +243,15 @@ def evaluate_3d_loc_demo(frame_names, dets, dets_gt, gnd_masks, metrics=None, vi
                     obj_gt_match_in_frame.append(None)
             eval_metrics = calculate_eval_metrics_in_frame(dets_in_frame, obj_gt_match_in_frame, metrics=metrics)
         if viz:
-            # visualize_3d_loc_in_frame(im_name, dets_in_frame, obj_gt_match_in_frame, eval_metrics)
-            visualize_3d_loc_in_frame_demo(im_name, dets_in_frame, dets_gt_in_frame, gnd_mask, eval_metrics, colors)
-            # visualize_gt_dets(im_name, dets_gt_in_frame)
+            # visualize_dets_3d_eval_in_frame(im_name, dets_in_frame, obj_gt_match_in_frame, eval_metrics)
+            visualize_dets_3d_eval_in_frame_demo(im_name, dets_in_frame, dets_gt_in_frame, gnd_mask, eval_metrics,
+                                                 colors)
         eval_metrics_all_frames.append(eval_metrics)
 
     return eval_metrics_all_frames
 
 
-# def evaluate_3d_loc_old(frame_names, dets, dets_gt, viz=True, log=True):
-#     # detections and gt detections must have the same length of frame number
-#     assert len(dets) == len(dets_gt)
-#
-#     eval_metrics_all_frames = []
-#
-#     for im_name, dets_in_frame, dets_gt_in_frame in zip(frame_names, dets, dets_gt):
-#         if log:
-#             print("Evaluate frame %s" % im_name)
-#         eval_metrics = {'flag': False}
-#         # iterate for each frame
-#         obj_gt_match_in_frame = []
-#         if dets_in_frame is not None:
-#             for obj in dets_in_frame:
-#                 # iterate over each detection result
-#                 # find the gt with the max iou
-#                 max_iou = 0.5
-#                 obj_gt_match = None
-#                 if dets_gt_in_frame is not None:
-#                     for obj_gt in dets_gt_in_frame:
-#                         # skip ground truth with truncation
-#                         if obj_gt.trun == xmlParser.TRUNC_TRUNCATED:
-#                             continue
-#                         if obj.category == obj_gt.category:
-#                             iou = calculate_iou_btw_obj(obj, obj_gt)
-#                             if iou > max_iou:
-#                                 max_iou = iou
-#                                 obj_gt_match = obj_gt
-#                 # only check the detections with matched gt
-#                 if obj_gt_match is not None:
-#                     obj.set_matched()
-#                 obj_gt_match_in_frame.append(obj_gt_match)
-#             eval_metrics = calculate_eval_metrics_in_frame(dets_in_frame, obj_gt_match_in_frame)
-#         if viz:
-#             visualize_3d_loc_in_frame(im_name, dets_in_frame, obj_gt_match_in_frame, eval_metrics)
-#             # visualize_gt_dets(im_name, dets_gt_in_frame)
-#         eval_metrics_all_frames.append(eval_metrics)
-#
-#     return eval_metrics_all_frames
-
-
 def print_eval_results(eval_metrics_all_frames):
-
     print("==============================")
     print("  Get evaluation from %s frames." % len(eval_metrics_all_frames))
 
@@ -378,7 +328,8 @@ def print_eval_results(eval_metrics_all_frames):
         print("  No valid near object.")
     if len(n_obj_near_30_list) != 0:
         dist_ae_near_30_all = np.average(dist_ae_near_30_list, weights=n_obj_near_30_list)
-        dist_std_near_30_all = np.sqrt(np.average((dist_ae_near_30_list - dist_ae_near_30_all) ** 2, weights=n_obj_near_30_list))
+        dist_std_near_30_all = np.sqrt(
+            np.average((dist_ae_near_30_list - dist_ae_near_30_all) ** 2, weights=n_obj_near_30_list))
         print("  Dist AE (near 30): %.4f m (%.4f)." % (dist_ae_near_30_all, dist_std_near_30_all))
     else:
         print("  No valid near 30 object.")
