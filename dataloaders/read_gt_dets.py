@@ -5,19 +5,6 @@ import pykitti
 from Object import Object
 import utils.parseTrackletXML as xmlParser
 
-# DATE = '2011_09_26'
-# DRIVE = '0091'
-# FOLDER_NAME = DATE + "_drive_" + DRIVE + "_sync"
-# BASEDIR = "/mnt/disk2/kitti-dataset/raw_data/"
-# DATA_ROOT = BASEDIR + DATE + "/" + FOLDER_NAME
-#
-# # interested classes
-# CLASS_NAME_LIST = ['person', 'car', 'bus', 'truck']
-#
-# data = pykitti.raw(BASEDIR, DATE, DRIVE)
-# K_cam2 = data.calib.K_cam2
-# T_cam2_velo = data.calib.T_cam2_velo
-
 
 def velo_to_cam2(x3d, y3d, z3d, T):
     velo_3d = np.array([x3d, y3d, z3d, 0])
